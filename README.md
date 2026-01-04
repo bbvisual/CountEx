@@ -1,5 +1,8 @@
 # CountEx
-[Project Page](https://yifehuang97.github.io/CountExProjPage/)
+[Project](https://yifehuang97.github.io/CountExProjPage/)
+[Demo](https://huggingface.co/spaces/yifehuang97/CountEx)
+[Data](https://huggingface.co/collections/BBVisual/cocount)
+[Model](https://huggingface.co/collections/BBVisual/countex)
 
 > **Note:** All training and inference use `bf16`, so only NVIDIA Ampere architecture (or newer) GPUs are supported.  
 > We conduct all experiments on NVIDIA RTX A5000 GPUs.
