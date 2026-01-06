@@ -1,5 +1,4 @@
 # CountEx
-[Project](https://yifehuang97.github.io/CountExProjPage/)
 [Demo](https://huggingface.co/spaces/yifehuang97/CountEx)
 [Data](https://huggingface.co/collections/BBVisual/cocount)
 [Model](https://huggingface.co/collections/BBVisual/countex)
