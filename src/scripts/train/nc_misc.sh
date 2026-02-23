@@ -6,8 +6,8 @@ export TORCH_DISTRIBUTED_DEBUG="DETAIL"
 export TOKENIZERS_PARALLELISM="false"
 export NCCL_P2P_DISABLE=1
 export CUDA_VISIBLE_DEVICES="0,1,2,3"
-export WANDB_API_KEY="64cf0019f2e4269963ca66e9a6917b960c3440bd"
-export HF_TOKEN="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"
+export WANDB_API_KEY=""
+export HF_TOKEN=""
 
 DEEPSPEED_CONFIG="ddp_cfgs/zero2.json"
 SIZE="tiny"
