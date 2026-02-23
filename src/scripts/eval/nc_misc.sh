@@ -1,7 +1,7 @@
 #!/bin/bash
 # export CC=$CONDA_PREFIX/bin/gcc
 # export CXX=$CONDA_PREFIX/bin/g++
-export HF_TOKEN="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" # replace with your own token
+export HF_TOKEN="" # replace with your own token
 export TOKENIZERS_PARALLELISM="false"
 export CUDA_VISIBLE_DEVICES="1"
 
