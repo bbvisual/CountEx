@@ -13,7 +13,7 @@ python eval.py \
     --ckpt_path "BBVisual/CountEX-NC-Desk" \
     --train_data_path "BBVisual/CoCount-train" \
     --val_data_path "BBVisual/CoCount-val" \
-    --test_data_path "BBVisual/CoCount-test-corrected0621" \
+    --test_data_path "BBVisual/CoCount-test_reported_in_paper" \
     --weakly_supervised_data_path "BBVisual/CoCount-train" \
     --backbone_size "${SIZE}" \
     --output_dir "./kc_eval" \
