@@ -12,14 +12,14 @@ We identified a small annotation issue in the test-set evaluation labels and cor
 
 The released dataset now contains the corrected test labels. Because the paper was submitted before this correction, the results reported in the paper were computed using the original test labels. The table below reports CountEx results on the corrected labels. The differences from the paper results are small, and the overall conclusions remain consistent.
 
-| Split        | # Corrected Images/Frames | Test MAE Reported in Paper | Test MAE on Corrected Labels | Test RMSE Reported in Paper | Test RMSE on Corrected Labels |
-| ------------ | ------------------------: | -------------------------: | ---------------------------: | --------------------------: | ----------------------------: |
-| Food         |                        30 |                      37.04 |                        37.40 |                       50.58 |                         51.30 |
-| Home         |                         0 |                      24.16 |                        24.16 |                       34.87 |                         34.87 |
-| Desk         |                        18 |                      31.18 |                        27.89 |                       51.90 |                         46.47 |
-| Misc         |                        72 |                      23.82 |                        22.97 |                       32.68 |                         31.88 |
-| Game         |                        30 |                      16.84 |                        16.84 |                       24.26 |                         24.26 |
-| Overall / KC |                       150 |                      12.72 |                        11.20 |                       23.99 |                         20.32 |
+| Split | # Corrected Images | MAE (Paper) | MAE (Corrected) | Abs Δ MAE | RMSE (Paper) | RMSE (Corrected) | Abs Δ RMSE |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Food | 30 | 37.04 | 37.40 | 0.36 | 50.58 | 51.30 | 0.72 |
+| Home | 0 | 24.16 | 24.16 | 0.00 | 34.87 | 34.87 | 0.00 |
+| Desk | 18 | 31.18 | 27.89 | 3.29 | 51.90 | 46.47 | 5.43 |
+| Misc | 72 | 23.82 | 22.97 | 0.85 | 32.68 | 31.88 | 0.80 |
+| Game | 30 | 16.84 | 16.84 | 0.00 | 24.26 | 24.26 | 0.00 |
+| KC (Overall) | 150 | 12.72 | 11.20 | 1.52 | 23.99 | 20.32 | 3.67 |
 
 For the Game split, although 30 images/frames were updated, the corrected counts are very close to the original counts, so the final MAE/RMSE remain unchanged after rounding.
 
