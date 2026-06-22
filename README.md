@@ -59,7 +59,7 @@ For reproducibility, we keep the original annotation version available, which co
 | Desk         |                        18 |               31.18 |                51.90 |                27.89 |                 46.47 |
 | Misc         |                        72 |               23.82 |                32.68 |                22.97 |                 31.88 |
 | Game         |                        30 |               16.84 |                24.26 |                16.84 |                 24.26 |
-| Overall / KC |                       150 |               12.72 |                23.99 |                11.20 |                 20.32 |
+| KC |                       150 |               12.72 |                23.99 |                11.20 |                 20.32 |
 
 
 ## How to Run Evaluation / Training
