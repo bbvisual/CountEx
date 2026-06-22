@@ -46,6 +46,22 @@ You can also run all the above steps by executing the provided script:
 bash src/eval_env_setup.sh
 ```
 
+### Note on Corrected Test Annotations
+
+We identified a small annotation issue in the test-set evaluation labels and corrected the affected annotations. The issue is limited to the evaluation labels and does not affect the training annotations used by CountEx, since CountEx is trained with dot annotations.
+
+For reproducibility, we keep the original annotation version available, which corresponds to the results reported in the paper. We also provide the corrected annotation version and report the updated CountEx evaluation results below. The changes are relatively small and the overall conclusions remain consistent.
+
+| Split        | # Corrected Images/Frames | Test MAE (Original) | Test RMSE (Original) | Test MAE (Corrected) | Test RMSE (Corrected) |
+| ------------ | ------------------------: | ------------------: | -------------------: | -------------------: | --------------------: |
+| Food         |                        30 |               37.04 |                50.58 |                37.40 |                 51.30 |
+| Home         |                         0 |               24.16 |                34.87 |                24.16 |                 34.87 |
+| Desk         |                        18 |               31.18 |                51.90 |                27.89 |                 46.47 |
+| Misc         |                        72 |               23.82 |                32.68 |                22.97 |                 31.88 |
+| Game         |                        30 |               16.84 |                24.26 |                16.84 |                 24.26 |
+| Overall / KC |                       150 |               12.72 |                23.99 |                11.20 |                 20.32 |
+
+
 ## How to Run Evaluation / Training
 
 CountEx supports two evaluation settings on the CoCount dataset:
