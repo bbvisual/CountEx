@@ -12,7 +12,7 @@ We identified a small annotation issue in the test-set evaluation labels and cor
 
 The released dataset now contains the corrected test labels. Because the paper was submitted before this correction, the results reported in the paper were computed using the original test labels. The table below reports CountEx results on the corrected labels. The differences from the paper results are small, and the overall conclusions remain consistent.
 
-| Split | # Corrected Images | MAE (Paper) | MAE (Corrected) | Abs Δ MAE | RMSE (Paper) | RMSE (Corrected) | Abs Δ RMSE |
+| Split | # Corrected Images | MAE (Paper Reported ) | MAE (Corrected) | Abs Δ MAE | RMSE (Paper Reported) | RMSE (Corrected) | Abs Δ RMSE |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Food | 30 | 37.04 | 37.40 | 0.36 | 50.58 | 51.30 | 0.72 |
 | Home | 0 | 24.16 | 24.16 | 0.00 | 34.87 | 34.87 | 0.00 |
