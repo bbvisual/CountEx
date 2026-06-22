@@ -6,6 +6,23 @@
 > **Note:** All training and inference use `bf16`, so only NVIDIA Ampere architecture (or newer) GPUs are supported.  
 > We conduct all experiments on NVIDIA RTX A5000 GPUs.
 
+## 📌 Important Note on Corrected Test Annotations
+
+We identified a small annotation issue in the test-set evaluation labels and corrected the affected annotations. The issue is limited to the evaluation labels and does not affect the training annotations used by CountEx, since CountEx is trained with dot annotations.
+
+The released dataset now contains the corrected test labels. Because the paper was submitted before this correction, the results reported in the paper were computed using the original test labels. The table below reports CountEx results on the corrected labels. The differences from the paper results are small, and the overall conclusions remain consistent.
+
+| Split        | # Corrected Images/Frames | Test MAE Reported in Paper | Test MAE on Corrected Labels | Test RMSE Reported in Paper | Test RMSE on Corrected Labels |
+| ------------ | ------------------------: | -------------------------: | ---------------------------: | --------------------------: | ----------------------------: |
+| Food         |                        30 |                      37.04 |                        37.40 |                       50.58 |                         51.30 |
+| Home         |                         0 |                      24.16 |                        24.16 |                       34.87 |                         34.87 |
+| Desk         |                        18 |                      31.18 |                        27.89 |                       51.90 |                         46.47 |
+| Misc         |                        72 |                      23.82 |                        22.97 |                       32.68 |                         31.88 |
+| Game         |                        30 |                      16.84 |                        16.84 |                       24.26 |                         24.26 |
+| Overall / KC |                       150 |                      12.72 |                        11.20 |                       23.99 |                         20.32 |
+
+For the Game split, although 30 images/frames were updated, the corrected counts are very close to the original counts, so the final MAE/RMSE remain unchanged after rounding.
+
 ## Setup
 
 1. **Clone the repository**
@@ -45,22 +62,6 @@ You can also run all the above steps by executing the provided script:
 ```bash
 bash src/eval_env_setup.sh
 ```
-
-### Note on Corrected Test Annotations
-
-We identified a small annotation issue in the test-set evaluation labels and corrected the affected annotations. The issue is limited to the evaluation labels and does not affect the training annotations used by CountEx, since CountEx is trained with dot annotations.
-
-For reproducibility, we keep the original annotation version available, which corresponds to the results reported in the paper. We also provide the corrected annotation version and report the updated CountEx evaluation results below. The changes are relatively small and the overall conclusions remain consistent.
-
-| Split        | # Corrected Images/Frames | Test MAE (Original) | Test RMSE (Original) | Test MAE (Corrected) | Test RMSE (Corrected) |
-| ------------ | ------------------------: | ------------------: | -------------------: | -------------------: | --------------------: |
-| Food         |                        30 |               37.04 |                50.58 |                37.40 |                 51.30 |
-| Home         |                         0 |               24.16 |                34.87 |                24.16 |                 34.87 |
-| Desk         |                        18 |               31.18 |                51.90 |                27.89 |                 46.47 |
-| Misc         |                        72 |               23.82 |                32.68 |                22.97 |                 31.88 |
-| Game         |                        30 |               16.84 |                24.26 |                16.84 |                 24.26 |
-| KC |                       150 |               12.72 |                23.99 |                11.20 |                 20.32 |
-
 
 ## How to Run Evaluation / Training
 
