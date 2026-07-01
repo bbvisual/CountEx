@@ -1,4 +1,4 @@
-# CountEx
+# CountEx: Fine-Grained Counting via Exemplars and Exclusion
 [Demo](https://huggingface.co/spaces/yifehuang97/CountEx)
 [Data](https://huggingface.co/collections/BBVisual/cocount)
 [Model](https://huggingface.co/collections/BBVisual/countex)
