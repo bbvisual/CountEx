@@ -1,4 +1,3 @@
-# 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
 import os
 import torch
 from PIL import ImageDraw

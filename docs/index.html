@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CountEx &amp; CoCount: Fine-Grained Counting via Exemplars and Exclusion</title>
+<meta name="description" content="CoCount: a large fine-grained counting benchmark where every image contains two confusable classes, annotated independently. Plus CountEx, an exemplar-and-exclusion counter.">
+<meta property="og:title" content="CountEx & CoCount: Fine-Grained Counting via Exemplars and Exclusion">
+<meta property="og:description" content="A 10,086-frame benchmark where every scene pairs two confusable classes, each annotated independently, and a counter that tells them apart.">
+<meta property="og:image" content="https://bbvisual.github.io/CountEx/assets/cocount_gallery.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#16181d; --muted:#5b6472; --line:#e4e7ec;
+    --card:#f7f8fa; --accent:#1f6feb; --pos:#20a76b; --neg:#e0453a;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#0f1116; --fg:#e8eaed; --muted:#9aa3b2; --line:#262b34;
+           --card:#171a21; --accent:#6aa8ff; --pos:#35c98a; --neg:#ff6b5f; }
+  }
+  /* Explicit theme wins over the OS preference, in both directions. */
+  :root[data-theme="dark"]{
+    --bg:#0f1116; --fg:#e8eaed; --muted:#9aa3b2; --line:#262b34;
+    --card:#171a21; --accent:#6aa8ff; --pos:#35c98a; --neg:#ff6b5f;
+  }
+  :root[data-theme="light"]{
+    --bg:#ffffff; --fg:#16181d; --muted:#5b6472; --line:#e4e7ec;
+    --card:#f7f8fa; --accent:#1f6feb; --pos:#20a76b; --neg:#e0453a;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  /* Headings in a system serif: an academic register without shipping a webfont
+     (font CDNs are unreliable here, and a silent fallback is worse than none). */
+  h1,h2,h3{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",
+                Georgia,"Times New Roman",serif;
+    font-weight:600; text-wrap:balance;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.9em}
+
+  /* ---- hero banner ---- */
+  .hero{
+    width:100%; display:block; border-bottom:1px solid var(--line);
+    aspect-ratio:2/1; object-fit:cover; background:var(--card);
+  }
+  .hero-cap{
+    max-width:var(--maxw); margin:0 auto; padding:10px 22px 0;
+    font-size:.86rem; color:var(--muted); text-align:center;
+  }
+
+  /* ---- header ---- */
+  header{padding:40px 0 36px; text-align:center; border-bottom:1px solid var(--line)}
+  h1{margin:0 0 6px; font-size:clamp(2rem,5vw,3.1rem); line-height:1.1; letter-spacing:-.02em}
+  h1 .sub{display:block; font-size:.44em; font-weight:500; color:var(--muted); margin-top:14px; letter-spacing:0}
+  .authors{margin:22px 0 4px; font-size:1.02rem}
+  .affil{color:var(--muted); font-size:.94rem; margin:0}
+  /* Visible-but-quiet placeholder, so an unfilled slot can't ship unnoticed. */
+  .todo{
+    display:inline-block; border:1px dashed var(--line); border-radius:4px;
+    padding:2px 8px; font-size:.85rem; color:var(--muted);
+  }
+
+  .links{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:26px 0 0}
+  .btn{
+    display:inline-block; padding:7px 16px; border:1px solid var(--line);
+    border-radius:4px; background:var(--card); color:var(--fg);
+    font-size:.94rem; transition:border-color .15s, color .15s;
+  }
+  .btn:hover,.btn:focus-visible{border-color:var(--accent); color:var(--accent); text-decoration:none}
+  .btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* ---- sections ---- */
+  section{padding:52px 0; border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:none}
+  h2{font-size:1.55rem; margin:0 0 6px; letter-spacing:-.01em}
+  h3{font-size:1.1rem; margin:34px 0 10px}
+  p{margin:14px 0}
+  .lead{font-size:1.14rem; color:var(--fg)}
+  .muted{color:var(--muted)}
+
+  figure{margin:26px 0 0}
+  figure img{width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:10px; background:var(--card)}
+  figcaption{margin-top:12px; font-size:.9rem; color:var(--muted); line-height:1.55}
+  .pos{color:var(--pos); font-weight:700}
+  .neg{color:var(--neg); font-weight:700}
+
+  /* ---- stat strip ---- */
+  .stats{
+    display:grid; gap:12px; margin:30px 0 0;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  }
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 14px; text-align:center}
+  .stat b{display:block; font-size:1.75rem; line-height:1.15; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .stat span{display:block; font-size:.8rem; color:var(--muted); margin-top:5px}
+
+  /* ---- tables ---- */
+  .scroll{overflow-x:auto; margin:22px 0 0; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; font-size:.92rem; font-variant-numeric:tabular-nums}
+  th,td{padding:9px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:.76rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700}
+  tbody tr:hover{background:var(--card)}
+  tr.total{font-weight:700} tr.total td{border-top:2px solid var(--line)}
+  caption{caption-side:bottom; margin-top:11px; font-size:.86rem; color:var(--muted); text-align:left}
+
+  pre{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:15px 17px; overflow-x:auto; margin:18px 0 0; font-size:.88rem; line-height:1.55;
+  }
+  pre code{color:var(--fg)}
+  ul{padding-left:22px} li{margin:7px 0}
+  footer{padding:40px 0 60px; color:var(--muted); font-size:.9rem; text-align:center}
+</style>
+</head>
+<body>
+
+<img class="hero" src="assets/cocount_teaser.jpg"
+     alt="Mosaic of CoCount scenes: mixed piles of beans, cards, cotton buds, craft sticks, chess pieces, batteries, buttons, pens, screws and clips photographed on tables and floors.">
+<p class="hero-cap">CoCount: 10,086 annotated frames, each containing two confusable object classes.</p>
+
+<header>
+  <div class="wrap">
+    <h1>CountEx
+      <span class="sub">Fine-Grained Counting via Exemplars and Exclusion</span>
+    </h1>
+
+    <p class="authors">Yifeng Huang &nbsp;·&nbsp; Gia Khanh Nguyen &nbsp;·&nbsp; Minh Hoai</p>
+    <!-- TODO: confirm affiliations and superscript mapping against the paper. -->
+    <p class="affil">European Conference on Computer Vision (ECCV) 2026</p>
+
+    <nav class="links">
+      <a class="btn" href="https://arxiv.org/abs/2602.19432">Paper</a>
+      <a class="btn" href="https://huggingface.co/collections/BBVisual/cocount">Dataset</a>
+      <a class="btn" href="https://huggingface.co/spaces/yifehuang97/CountEx">Demo</a>
+      <a class="btn" href="https://github.com/bbvisual/CountEx">Code</a>
+      <a class="btn" href="https://huggingface.co/collections/BBVisual/countex">Models</a>
+      <a class="btn" href="https://wandb.ai/yife/CountEx_KC/">Training logs</a>
+    </nav>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>CoCount: every scene contains its own distractor</h2>
+
+    <p class="lead">
+      Class-agnostic counters do well on benchmarks where the only salient repeated object
+      <em>is</em> the target. Real requests are narrower: count the <em>black</em> beans, not every
+      bean; the 1000-dong notes, not all the banknotes. <strong>CoCount</strong> is built to make
+      that distinction unavoidable: every image contains <strong>two confusable classes</strong>,
+      each annotated with its own independent set of dots.
+    </p>
+
+    <div class="stats">
+      <div class="stat"><b>10,086</b><span>annotated frames</span></div>
+      <div class="stat"><b>20,172</b><span>counting queries</span></div>
+      <div class="stat"><b>97</b><span>category pairs</span></div>
+      <div class="stat"><b>5</b><span>supercategories</span></div>
+      <div class="stat"><b>2–472</b><span>objects per class</span></div>
+    </div>
+
+    <figure>
+      <img src="assets/cocount_gallery.jpg" alt="Ten CoCount examples: one per supercategory for each of the INTER and INTRA pairing modes, with positive dots in green and negative dots in red.">
+      <figcaption>
+        One example per supercategory (columns) for each pairing mode (rows).
+        <span class="pos">Green</span> = positive-class dots, <span class="neg">red</span> =
+        negative-class dots; per-class counts at right. <strong>INTER</strong> pairs two different
+        object classes (shallot / garlic, screw / nail). <strong>INTRA</strong> pairs two variants
+        of the <em>same</em> class, differing only in colour, size or marking: Chinese playing
+        cards with and without red marks, 1000- vs 5000-dong notes, long vs short screws. INTRA is
+        the harder case, and it is where class-agnostic counting has nothing to say.
+      </figcaption>
+    </figure>
+
+    <p>
+      Because both classes are annotated, one frame yields <strong>two</strong> counting queries:
+      count A while excluding B, then count B while excluding A. The released splits store one
+      record per query, which is why <code>CoCount-train</code> has 14,834 rows over 7,417 distinct
+      frames. Across all three splits: <strong>7,417</strong> train, <strong>1,335</strong> val and
+      <strong>1,334</strong> test frames, for 10,086 in total.
+    </p>
+
+    <h3>Why the two-class design matters</h3>
+    <p>
+      Because both classes in a scene are annotated, the same image yields two counting problems
+      with the same pixels and different answers. A model that ignores the exemplars and counts
+      "everything small and repeated" is penalised on both. The pairing also gives every positive a
+      matched hard negative for free, with no mining and no synthetic composition.
+    </p>
+
+    <h3>Scale by supercategory</h3>
+    <div class="scroll">
+      <table>
+        <caption>The <code>CoCount-train</code> split, counted over distinct frames. Points are the
+        sum of both classes, so each frame contributes its positive and negative dots.</caption>
+        <thead>
+          <tr><th>Supercategory</th><th>Code</th><th>Frames</th><th>Pairs</th>
+              <th>INTER</th><th>INTRA</th><th>Points</th><th>Count range</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Food</td><td>FOO</td><td>1,820</td><td>19</td><td>920</td><td>900</td><td>434,240</td><td>4–472</td></tr>
+          <tr><td>Game</td><td>FUN</td><td>1,270</td><td>20</td><td>578</td><td>692</td><td>123,277</td><td>2–145</td></tr>
+          <tr><td>Home</td><td>HOU</td><td>1,710</td><td>20</td><td>884</td><td>826</td><td>244,164</td><td>4–283</td></tr>
+          <tr><td>Desk</td><td>OFF</td><td>1,720</td><td>20</td><td>960</td><td>760</td><td>253,180</td><td>5–312</td></tr>
+          <tr><td>Misc</td><td>OTR</td><td>897</td><td>18</td><td>446</td><td>451</td><td>104,775</td><td>4–269</td></tr>
+          <tr class="total"><td>Total</td><td></td><td>7,417</td><td>97</td><td>3,788</td><td>3,629</td><td>1,159,636</td><td>2–472</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Counts are dense, not toy</h3>
+    <div class="scroll">
+      <table>
+        <caption>Cumulative share of classes at or below each object count. Median 53, mean 78.</caption>
+        <thead><tr><th>Objects per class</th><th>≤10</th><th>≤25</th><th>≤50</th><th>≤100</th><th>≤200</th><th>≤400</th></tr></thead>
+        <tbody><tr><td>Cumulative share</td><td>3.4%</td><td>18.7%</td><td>47.8%</td><td>76.2%</td><td>93.0%</td><td>99.5%</td></tr></tbody>
+      </table>
+    </div>
+
+    <h3>Loading it</h3>
+    <pre><code>from datasets import load_dataset
+
+ds = load_dataset("BBVisual/CoCount-train", split="train")
+ex = ds[0]
+print(ex["pos_caption"], ex["pos_count"], len(ex["pos_points"]))
+print(ex["neg_caption"], ex["neg_count"], len(ex["neg_points"]))</code></pre>
+
+    <p>
+      Each record carries the image, both class names, both counts, both dot sets in absolute pixel
+      coordinates, and exemplar boxes for each class.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>CountEx</h2>
+    <p class="lead">
+      CountEx lets a user express both <em>inclusion</em> and <em>exclusion</em> intent (what to
+      count and what to ignore) through natural-language descriptions and optional visual
+      exemplars. At its core is a <strong>Discriminative Query Refinement</strong> module, which
+      reasons jointly over the two cues: it first identifies visual features the target and the
+      distractor share, then isolates the patterns specific to the exclusion, then applies selective
+      suppression to refine the counting query.
+    </p>
+    <p class="muted">
+      Existing prompt-based counters let you say what to count but give you no way to say what to
+      leave out, so cluttered scenes with confusable categories produce ambiguity and overcounting.
+      Full abstract in the <a href="https://arxiv.org/abs/2602.19432">paper</a>.
+    </p>
+    <!-- TODO: add the architecture figure to assets/ and reference it here. -->
+    <p><span class="todo">TODO: architecture figure</span></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>CountEx on CoCount</h2>
+
+    <p>
+      Two settings. <strong>KC (known-category)</strong> trains on all five supercategories and
+      tests on seen categories. <strong>NC (novel-category)</strong> holds one supercategory out
+      entirely, measuring zero-shot transfer to unseen objects.
+    </p>
+
+    <!-- TODO: add the baseline comparison table (CountGD, DAVE, LOCA, …) from the paper. -->
+    <p><span class="todo">TODO: baseline comparison table</span></p>
+
+    <h3>Corrected test annotations</h3>
+    <p>
+      We found an annotation issue in the test-set <em>evaluation</em> labels and corrected it. The
+      issue is confined to evaluation labels and does not touch the training annotations CountEx
+      learns from, since training uses dot annotations. The released dataset now ships the corrected
+      labels; the paper was submitted beforehand and reports the originals. Both are below;
+      differences are small and the conclusions are unchanged.
+    </p>
+    <div class="scroll">
+      <table>
+        <caption>Lower is better. The pre-correction labels remain downloadable as
+        <code>BBVisual/CoCount-test_reported_in_paper</code> for exact reproduction of the paper.</caption>
+        <thead>
+          <tr><th>Split</th><th>Corrected imgs</th><th>MAE (paper)</th><th>MAE (corrected)</th>
+              <th>Δ</th><th>RMSE (paper)</th><th>RMSE (corrected)</th><th>Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Food</td><td>30</td><td>37.04</td><td>37.40</td><td>0.36</td><td>50.58</td><td>51.30</td><td>0.72</td></tr>
+          <tr><td>Home</td><td>0</td><td>24.16</td><td>24.16</td><td>0.00</td><td>34.87</td><td>34.87</td><td>0.00</td></tr>
+          <tr><td>Desk</td><td>18</td><td>31.18</td><td>27.89</td><td>3.29</td><td>51.90</td><td>46.47</td><td>5.43</td></tr>
+          <tr><td>Misc</td><td>72</td><td>23.82</td><td>22.97</td><td>0.85</td><td>32.68</td><td>31.88</td><td>0.80</td></tr>
+          <tr><td>Game</td><td>30</td><td>16.84</td><td>16.84</td><td>0.00</td><td>24.26</td><td>24.26</td><td>0.00</td></tr>
+          <tr class="total"><td>KC (overall)</td><td>150</td><td>12.72</td><td>11.20</td><td>1.52</td><td>23.99</td><td>20.32</td><td>3.67</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">
+      For Game, 30 frames were updated but the corrected counts land very close to the originals, so
+      MAE and RMSE are unchanged after rounding.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Code and checkpoints</h2>
+    <pre><code>git clone https://github.com/bbvisual/CountEx.git
+cd CountEx
+bash src/eval_env_setup.sh          # conda env + deps (bf16 → Ampere or newer)
+
+export HF_TOKEN=your_token_here
+cd src
+bash scripts/eval/kc.sh             # known-category
+bash scripts/eval/nc_food.sh        # novel-category, Food held out</code></pre>
+    <p>
+      Checkpoints download from the Hub automatically: <code>BBVisual/CountEX-KC</code> for the KC
+      setting and <code>BBVisual/CountEX-NC-{Food,Home,Desk,Misc,Game}</code> for each novel-category
+      fold. Full instructions, training recipes and the split-code mapping are in the
+      <a href="https://github.com/bbvisual/CountEx#readme">repository README</a>.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>BibTeX</h2>
+    <!-- TODO: add the page range once the proceedings are out. -->
+    <pre><code>@inproceedings{countex2026,
+  title     = {CountEx: Fine-Grained Counting via Exemplars and Exclusion},
+  author    = {Huang, Yifeng and Nguyen, Gia Khanh and Hoai, Minh},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="https://github.com/bbvisual/CountEx">github.com/bbvisual/CountEx</a>
+  </div>
+</footer>
+
+</body>
+</html>

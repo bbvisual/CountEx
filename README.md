@@ -1,139 +1,271 @@
+<p align="center">
+  <img src="docs/assets/cocount_teaser.jpg" alt="CoCount dataset examples" width="100%">
+</p>
+
+<div align="center">
+
 # CountEx: Fine-Grained Counting via Exemplars and Exclusion
-[Demo](https://huggingface.co/spaces/yifehuang97/CountEx)
-[Data](https://huggingface.co/collections/BBVisual/cocount)
-[Model](https://huggingface.co/collections/BBVisual/countex)
 
-> **Note:** All training and inference use `bf16`, so only NVIDIA Ampere architecture (or newer) GPUs are supported.  
-> We conduct all experiments on NVIDIA RTX A5000 GPUs.
+Yifeng Huang · Gia Khanh Nguyen · Minh Hoai
 
-## 📌 Important Note on Corrected Test Annotations
+**ECCV 2026**
 
-We identified a small annotation issue in the test-set evaluation labels and corrected the affected annotations. The issue is limited to the evaluation labels and does not affect the training annotations used by CountEx, since CountEx is trained with dot annotations.
+**[Paper](https://arxiv.org/abs/2602.19432)** &nbsp;•&nbsp;
+**[Project page](https://bbvisual.github.io/CountEx/)** &nbsp;•&nbsp;
+**[CoCount dataset](https://huggingface.co/collections/BBVisual/cocount)** &nbsp;•&nbsp;
+**[Models](https://huggingface.co/collections/BBVisual/countex)** &nbsp;•&nbsp;
+**[Demo](https://huggingface.co/spaces/yifehuang97/CountEx)** &nbsp;•&nbsp;
+**[Training logs](https://wandb.ai/yife/CountEx_KC/)**
 
-The released dataset now contains the corrected test labels. Because the paper was submitted before this correction, the results reported in the paper were computed using the original test labels. The table below reports CountEx results on the corrected labels. The differences from the paper results are small, and the overall conclusions remain consistent.
+</div>
 
-| Split | # Corrected Images | MAE (Paper Reported ) | MAE (Corrected) | Abs Δ MAE | RMSE (Paper Reported) | RMSE (Corrected) | Abs Δ RMSE |
+---
+
+CountEx lets you say both what to count **and what to ignore**, through natural-language
+descriptions and optional visual exemplars. Existing prompt-based counters support only inclusion,
+so cluttered scenes with confusable categories produce ambiguity and overcounting: black beans among
+soy beans, 1000-dong notes among 5000-dong notes, screws among nails. At its core is a
+**Discriminative Query Refinement** module, which identifies features the target and distractor
+share, isolates the exclusion-specific patterns, then selectively suppresses them to refine the
+counting query.
+
+Alongside the method we release **CoCount**, a large fine-grained counting benchmark in which
+*every* image contains two confusable classes annotated independently, so a model cannot score
+well by simply counting "all the small round things."
+
+> **Hardware note:** all training and inference run in `bf16`, so an NVIDIA **Ampere or newer** GPU
+> is required. All experiments were conducted on NVIDIA RTX A5000 GPUs.
+
+---
+
+## The CoCount dataset
+
+<div align="center">
+  <img src="docs/assets/cocount_gallery.jpg" width="100%" alt="CoCount examples across the five supercategories">
+</div>
+
+<div align="center">
+<em>One example per supercategory (columns) for each pairing mode (rows).
+<b>Green</b> = positive class dots, <b>red</b> = negative class dots; per-class counts at right.
+<b>INTER</b> pairs two different object classes; <b>INTRA</b> pairs two variants of the same class
+(colour, size, marking): the harder case.</em>
+</div>
+
+<br>
+
+Every image is annotated with **two** independent dot sets, one per class, so the same scene
+serves as both a positive and a negative counting target. This is what makes the benchmark
+fine-grained: getting the right answer requires discriminating the target from a distractor that a
+generic class-agnostic counter would happily include.
+
+CoCount comprises **10,086 annotated frames** across **97 category pairs** in five
+supercategories. Because both classes in a frame are annotated, each frame yields **two** counting
+queries (count A excluding B, then count B excluding A), and the released splits store one record
+per query. So `CoCount-train` has 14,834 rows over 7,417 distinct frames; likewise 1,335 val and
+1,334 test frames.
+
+**Scale of the training split**, over distinct frames:
+
+| Supercategory | Code | Frames | Class pairs | INTER | INTRA | Annotated points | Count range |
+|---|:--:|---:|---:|---:|---:|---:|:--:|
+| Food | `FOO` | 1,820 | 19 | 920 | 900 | 434,240 | 4–472 |
+| Game | `FUN` | 1,270 | 20 | 578 | 692 | 123,277 | 2–145 |
+| Home | `HOU` | 1,710 | 20 | 884 | 826 | 244,164 | 4–283 |
+| Desk | `OFF` | 1,720 | 20 | 960 | 760 | 253,180 | 5–312 |
+| Misc | `OTR` | 897 | 18 | 446 | 451 | 104,775 | 4–269 |
+| **Total** | | **7,417** | **97** | **3,788** | **3,629** | **1,159,636** | **2–472** |
+
+Counts per class are dense and long-tailed: median 53, mean 78, and fewer than half of all classes
+have 50 objects or fewer:
+
+| Objects per class | ≤10 | ≤25 | ≤50 | ≤100 | ≤200 | ≤400 |
+|---|---:|---:|---:|---:|---:|---:|
+| Cumulative share | 3.4% | 18.7% | 47.8% | 76.2% | 93.0% | 99.5% |
+
+**Per-image fields:** `image`, `pos_caption` / `neg_caption` (class names), `pos_count` /
+`neg_count`, `pos_points` / `neg_points` (absolute-pixel dot coordinates),
+`positive_exemplars` / `negative_exemplars` (exemplar boxes), plus `category` (the
+`{INTER,INTRA}_{SUPER}_{classA}_{classB}` pair id), `video_id` and `image_name`.
+
+```python
+from datasets import load_dataset
+
+ds = load_dataset("BBVisual/CoCount-train", split="train")
+ex = ds[0]
+print(ex["pos_caption"], ex["pos_count"], len(ex["pos_points"]))
+print(ex["neg_caption"], ex["neg_count"], len(ex["neg_points"]))
+```
+
+### Corrected test annotations
+
+We identified an annotation issue in the test-set **evaluation labels** and corrected the affected
+annotations. The issue is limited to evaluation labels and does not affect the training
+annotations used by CountEx, since CountEx trains from dot annotations.
+
+The released dataset now contains the corrected test labels. Because the paper was submitted
+before the correction, the paper's reported results use the original labels. The table below gives
+CountEx under both. Differences are small and the conclusions are unchanged.
+
+| Split | # Corrected images | MAE (paper) | MAE (corrected) | Δ MAE | RMSE (paper) | RMSE (corrected) | Δ RMSE |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Food | 30 | 37.04 | 37.40 | 0.36 | 50.58 | 51.30 | 0.72 |
 | Home | 0 | 24.16 | 24.16 | 0.00 | 34.87 | 34.87 | 0.00 |
 | Desk | 18 | 31.18 | 27.89 | 3.29 | 51.90 | 46.47 | 5.43 |
 | Misc | 72 | 23.82 | 22.97 | 0.85 | 32.68 | 31.88 | 0.80 |
 | Game | 30 | 16.84 | 16.84 | 0.00 | 24.26 | 24.26 | 0.00 |
-| KC (Overall) | 150 | 12.72 | 11.20 | 1.52 | 23.99 | 20.32 | 3.67 |
+| **KC (overall)** | **150** | **12.72** | **11.20** | **1.52** | **23.99** | **20.32** | **3.67** |
 
-For the Game split, although 30 images/frames were updated, the corrected counts are very close to the original counts, so the final MAE/RMSE remain unchanged after rounding.
+For the Game split, 30 frames were updated but the corrected counts are very close to the
+originals, so MAE/RMSE are unchanged after rounding.
+
+To reproduce **the numbers printed in the paper**, use the `*_reported.sh` scripts; they point
+`--test_data_path` at `BBVisual/CoCount-test_reported_in_paper` (the pre-correction labels). The
+plain scripts evaluate on the corrected `BBVisual/CoCount-test`, and are what you should use for
+new comparisons.
+
+---
 
 ## Setup
 
-1. **Clone the repository**
 ```bash
-   git clone <repository-url>
-   cd CountEx
-```
+git clone https://github.com/bbvisual/CountEx.git
+cd CountEx
 
-2. **Create and activate a conda environment**
-```bash
-   conda create -n countex python=3.10.18
-   conda activate countex
-```
+conda create -n countex python=3.10.18
+conda activate countex
 
-3. **Install dependencies**
+# PyTorch, CUDA 12.1
+pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 \
+    --index-url https://download.pytorch.org/whl/cu121
 
-- **Install PyTorch with CUDA 12.1**
-```bash
-pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu121
-```
-   - **Install other packages**
-```bash
-pip install transformers==4.42.0
-pip install deepspeed==0.17.0
-pip install accelerate==1.6.0
-pip install wandb
-pip install datasets
-pip install matplotlib
-pip install scipy
-```
-   - **(Training, for gcc-11)**
-```bash
+pip install transformers==4.42.0 deepspeed==0.17.0 accelerate==1.6.0 \
+    wandb datasets matplotlib scipy
+
+# training only, for gcc-11
 conda install -c conda-forge gcc=11 gxx=11
 ```
 
-You can also run all the above steps by executing the provided script:
+All of the above is also scripted:
+
 ```bash
 bash src/eval_env_setup.sh
 ```
 
-## How to Run Evaluation / Training
+### Hugging Face token
 
-CountEx supports two evaluation settings on the CoCount dataset:
+Export a token before running anything that pulls data or checkpoints:
 
-- **KC-setting (Known-Category)**: All five supercategories are available during training. This setting evaluates the model's performance on categories it has seen during training.
-- **NC-setting (Novel-Category)**: Each supercategory is held out as the test set while training on the remaining four. This setting evaluates zero-shot generalization to novel object categories.
-
-### Prerequisites
-
-1. **Set your Hugging Face token**  
-   Edit the `export HF_TOKEN=...` line in the evaluation scripts located in `src/scripts/eval/`, or export it manually in your terminal:
 ```bash
-   export HF_TOKEN=your_huggingface_token_here
+export HF_TOKEN=your_huggingface_token_here
 ```
 
-### Running Evaluation
+The provided scripts contain an empty `export HF_TOKEN=""` line; either fill it in or delete that
+line and rely on your shell environment. Each script also pins `CUDA_VISIBLE_DEVICES`
+(eval: `1`, train: `0,1,2,3`). Edit these to match your machine.
 
-**For KC-setting:**
+---
+
+## Evaluation
+
+CountEx is evaluated in two settings on CoCount:
+
+- **KC (Known-Category)**: all five supercategories are seen during training; measures
+  performance on categories the model has seen.
+- **NC (Novel-Category)**: one supercategory is held out for test while training on the other
+  four; measures zero-shot generalisation to unseen object categories.
+
 ```bash
 cd src
-bash scripts/eval/KC.sh
+
+# KC, corrected labels
+bash scripts/eval/kc.sh
+
+# NC, hold out one supercategory
+bash scripts/eval/nc_food.sh   # test Food; train Home, Desk, Misc, Game
+bash scripts/eval/nc_home.sh   # test Home; train Food, Desk, Misc, Game
+bash scripts/eval/nc_desk.sh   # test Desk; train Food, Home, Misc, Game
+bash scripts/eval/nc_misc.sh   # test Misc; train Food, Home, Desk, Game
+bash scripts/eval/nc_game.sh   # test Game; train Food, Home, Desk, Misc
 ```
 
-**For NC-setting** (choose the supercategory to hold out):
-```bash
-cd src
-# Test on Food (train on Home, Desk, Misc, Game)
-bash scripts/eval/nc_food.sh
+Append `_reported` to any of these to evaluate against the original pre-correction paper labels,
+e.g. `bash scripts/eval/kc_reported.sh`.
 
-# Test on Home (train on Food, Desk, Misc, Game)
-bash scripts/eval/nc_home.sh
+Each script pulls its checkpoint from the Hub (`BBVisual/CountEX-KC`,
+`BBVisual/CountEX-NC-Food`, …), so no local weights are needed.
 
-# Test on Desk (train on Food, Home, Misc, Game)
-bash scripts/eval/nc_desk.sh
+Split codes used by `--data_split`, if you invoke `eval.py` directly:
 
-# Test on Misc (train on Food, Home, Desk, Game)
-bash scripts/eval/nc_misc.sh
+| Setting | Food | Game | Home | Desk | Misc | All |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| `--data_split` | `FOO` | `FUN` | `HOU` | `OFF` | `OTR` | `ALL` |
 
-# Test on Game (train on Food, Home, Desk, Misc)
-bash scripts/eval/nc_game.sh
-```
+---
 
 ## Training
 
-### For KC-setting
 ```bash
-bash scripts/train/kc.sh
+cd src
+
+bash scripts/train/kc.sh       # KC setting, all supercategories
+
+bash scripts/train/nc_food.sh  # hold out Food
+bash scripts/train/nc_home.sh  # hold out Home
+bash scripts/train/nc_desk.sh  # hold out Desk
+bash scripts/train/nc_misc.sh  # hold out Misc
+bash scripts/train/nc_game.sh  # hold out Game
 ```
 
-We provide wandb training logs with this codebase for the KC-setting as a reference: [📊 View training logs](https://wandb.ai/yife/CountEx_KC/)
+Defaults: 4 GPUs via `accelerate` + DeepSpeed ZeRO-2 (`ddp_cfgs/zero2.json`,
+`ddp_cfgs/1n4r.yaml`), 3 epochs, constant LR `1.5e-5`, per-device batch size 1, seed `888`.
 
-### For NC-setting (choose the supercategory to hold out):
-```bash
-# Train on Home, Desk, Misc, Game; test on Food
-bash scripts/train/nc_food.sh
+**Before launching, edit `--output_dir`** in the training scripts; it is hardcoded to an
+author-machine path (`/data/add_disk0/yifengc/countex_exp`). Set `WANDB_API_KEY` as well, or change
+`--report_to` to `"none"` if you do not want Weights & Biases logging.
 
-# Train on Food, Desk, Misc, Game; test on Home
-bash scripts/train/nc_home.sh
+Reference training curves for the KC setting: **[wandb logs](https://wandb.ai/yife/CountEx_KC/)**.
 
-# Train on Food, Home, Misc, Game; test on Desk
-bash scripts/train/nc_desk.sh
+---
 
-# Train on Food, Home, Desk, Game; test on Misc
-bash scripts/train/nc_misc.sh
+## Live demo
 
-# Train on Food, Home, Desk, Misc; test on Game
-bash scripts/train/nc_game.sh
+Try CountEx in the browser: upload an image, box a few positive and negative exemplars, get a
+count: **[huggingface.co/spaces/yifehuang97/CountEx](https://huggingface.co/spaces/yifehuang97/CountEx)**
+
+---
+
+## Repository layout
+
+```
+src/
+├── train.py                     # training entry point (HfArgumentParser)
+├── eval.py                      # evaluation entry point
+├── trainer.py                   # custom Trainer
+├── criterion.py                 # losses
+├── utils.py                     # dataset building, collation, post-processing
+├── eval_env_setup.sh            # one-shot environment install
+├── hf_model/
+│   ├── CountEX.py               # the CountEx model
+│   ├── modeling_grounding_dino.py
+│   └── mmdet2groundingdino_swin{t,b,l}.py   # mmdet → HF weight converters
+├── ddp_cfgs/                    # accelerate + DeepSpeed configs
+└── scripts/
+    ├── eval/                    # kc.sh, nc_*.sh (+ *_reported.sh variants)
+    └── train/                   # kc.sh, nc_*.sh
+docs/                            # project page (GitHub Pages)
 ```
 
-## Live Demo
+---
 
-You can try CountEx directly in your browser via our Hugging Face Spaces demo:
+## Citation
 
-👉 [CountEx Interactive Demo](https://huggingface.co/spaces/yifehuang97/CountEx)
+<!-- TODO: add the page range once the proceedings are out. -->
+
+```bibtex
+@inproceedings{countex2026,
+  title     = {CountEx: Fine-Grained Counting via Exemplars and Exclusion},
+  author    = {Huang, Yifeng and Nguyen, Gia Khanh and Hoai, Minh},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}
+```
