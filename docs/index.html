@@ -48,9 +48,12 @@
   code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.9em}
 
   /* ---- hero banner ---- */
+  /* A banner strip, not a full-viewport image: cap the height and let
+     object-fit crop, so the title is visible without scrolling. */
   .hero{
     width:100%; display:block; border-bottom:1px solid var(--line);
-    aspect-ratio:2/1; object-fit:cover; background:var(--card);
+    height:clamp(150px, 26vh, 280px); object-fit:cover; object-position:center;
+    background:var(--card);
   }
   .hero-cap{
     max-width:var(--maxw); margin:0 auto; padding:10px 22px 0;
@@ -90,6 +93,9 @@
   figure{margin:26px 0 0}
   figure img{width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:10px; background:var(--card)}
   figcaption{margin-top:12px; font-size:.9rem; color:var(--muted); line-height:1.55}
+  /* The diagram is black-on-white line art, so keep it on white in both themes
+     rather than letting a dark ground fight it. */
+  .diagram img{background:#fff; padding:10px}
   .pos{color:var(--pos); font-weight:700}
   .neg{color:var(--neg); font-weight:700}
 
@@ -155,7 +161,8 @@
     <p class="lead">
       Class-agnostic counters do well on benchmarks where the only salient repeated object
       <em>is</em> the target. Real requests are narrower: count the <em>black</em> beans, not every
-      bean; the 1000-dong notes, not all the banknotes. <strong>CoCount</strong> is built to make
+      bean; the black coffee candies, not every sweet in the pile. <strong>CoCount</strong> is
+      built to make
       that distinction unavoidable: every image contains <strong>two confusable classes</strong>,
       each annotated with its own independent set of dots.
     </p>
@@ -165,7 +172,7 @@
       <div class="stat"><b>20,172</b><span>counting queries</span></div>
       <div class="stat"><b>97</b><span>category pairs</span></div>
       <div class="stat"><b>5</b><span>supercategories</span></div>
-      <div class="stat"><b>2–472</b><span>objects per class</span></div>
+      <div class="stat"><b>2-472</b><span>objects per class</span></div>
     </div>
 
     <figure>
@@ -176,7 +183,7 @@
         negative-class dots; per-class counts at right. <strong>INTER</strong> pairs two different
         object classes (shallot / garlic, screw / nail). <strong>INTRA</strong> pairs two variants
         of the <em>same</em> class, differing only in colour, size or marking: Chinese playing
-        cards with and without red marks, 1000- vs 5000-dong notes, long vs short screws. INTRA is
+        black vs brown coffee candy, white vs black chess pieces, long vs short screws. INTRA is
         the harder case, and it is where class-agnostic counting has nothing to say.
       </figcaption>
     </figure>
@@ -207,12 +214,12 @@
               <th>INTER</th><th>INTRA</th><th>Points</th><th>Count range</th></tr>
         </thead>
         <tbody>
-          <tr><td>Food</td><td>FOO</td><td>1,820</td><td>19</td><td>920</td><td>900</td><td>434,240</td><td>4–472</td></tr>
-          <tr><td>Game</td><td>FUN</td><td>1,270</td><td>20</td><td>578</td><td>692</td><td>123,277</td><td>2–145</td></tr>
-          <tr><td>Home</td><td>HOU</td><td>1,710</td><td>20</td><td>884</td><td>826</td><td>244,164</td><td>4–283</td></tr>
-          <tr><td>Desk</td><td>OFF</td><td>1,720</td><td>20</td><td>960</td><td>760</td><td>253,180</td><td>5–312</td></tr>
-          <tr><td>Misc</td><td>OTR</td><td>897</td><td>18</td><td>446</td><td>451</td><td>104,775</td><td>4–269</td></tr>
-          <tr class="total"><td>Total</td><td></td><td>7,417</td><td>97</td><td>3,788</td><td>3,629</td><td>1,159,636</td><td>2–472</td></tr>
+          <tr><td>Food</td><td>FOO</td><td>1,820</td><td>19</td><td>920</td><td>900</td><td>434,240</td><td>4-472</td></tr>
+          <tr><td>Game</td><td>FUN</td><td>1,270</td><td>20</td><td>578</td><td>692</td><td>123,277</td><td>2-145</td></tr>
+          <tr><td>Home</td><td>HOU</td><td>1,710</td><td>20</td><td>884</td><td>826</td><td>244,164</td><td>4-283</td></tr>
+          <tr><td>Desk</td><td>OFF</td><td>1,720</td><td>20</td><td>960</td><td>760</td><td>253,180</td><td>5-312</td></tr>
+          <tr><td>Misc</td><td>OTR</td><td>897</td><td>18</td><td>446</td><td>451</td><td>104,775</td><td>4-269</td></tr>
+          <tr class="total"><td>Total</td><td></td><td>7,417</td><td>97</td><td>3,788</td><td>3,629</td><td>1,159,636</td><td>2-472</td></tr>
         </tbody>
       </table>
     </div>
@@ -257,8 +264,20 @@ print(ex["neg_caption"], ex["neg_count"], len(ex["neg_points"]))</code></pre>
       leave out, so cluttered scenes with confusable categories produce ambiguity and overcounting.
       Full abstract in the <a href="https://arxiv.org/abs/2602.19432">paper</a>.
     </p>
-    <!-- TODO: add the architecture figure to assets/ and reference it here. -->
-    <p><span class="todo">TODO: architecture figure</span></p>
+    <figure class="diagram">
+      <img src="assets/architecture.png"
+           alt="CountEx architecture. Positive and negative text prompts with optional visual exemplars are encoded into positive and negative query sets. Discriminative Query Refinement then runs Shared Feature Identification to learn common prototypes, Exclusive Feature Extraction to project out and select the most exclusive negative residuals, and Selective Query Refinement to fuse them into the positive queries by gated cross-attention, before the decoder predicts points.">
+      <figcaption>
+        <strong>Overview of CountEx.</strong> The image and both prompts are encoded into a positive
+        and a negative query set. <em>Shared Feature Identification</em> pools learnable prototypes
+        over both sets to capture what the target and distractor have in common.
+        <em>Exclusive Feature Extraction</em> projects that shared component out of the negative
+        queries and keeps the residuals furthest from it, giving what is distinctive about the
+        distractor alone. <em>Selective Query Refinement</em> then subtracts those residuals from the
+        positive queries through gated cross-attention, repeated N times, so the decoder counts the
+        target without the distractor. The density branch is used only during training.
+      </figcaption>
+    </figure>
   </div>
 </section>
 

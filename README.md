@@ -24,10 +24,24 @@ Yifeng Huang · Gia Khanh Nguyen · Minh Hoai
 CountEx lets you say both what to count **and what to ignore**, through natural-language
 descriptions and optional visual exemplars. Existing prompt-based counters support only inclusion,
 so cluttered scenes with confusable categories produce ambiguity and overcounting: black beans among
-soy beans, 1000-dong notes among 5000-dong notes, screws among nails. At its core is a
+soy beans, black coffee candies among brown ones, screws among nails. At its core is a
 **Discriminative Query Refinement** module, which identifies features the target and distractor
 share, isolates the exclusion-specific patterns, then selectively suppresses them to refine the
 counting query.
+
+<p align="center">
+  <img src="docs/assets/architecture.png" alt="CountEx architecture overview" width="100%">
+</p>
+
+<div align="center">
+<em><b>Overview of CountEx.</b> Shared Feature Identification pools learnable prototypes over the
+positive and negative query sets to capture what the two classes share; Exclusive Feature Extraction
+projects that component out and keeps the most distinctive negative residuals; Selective Query
+Refinement subtracts them from the positive queries by gated cross-attention. The density branch is
+used at training time only.</em>
+</div>
+
+<br>
 
 Alongside the method we release **CoCount**, a large fine-grained counting benchmark in which
 *every* image contains two confusable classes annotated independently, so a model cannot score
@@ -68,12 +82,12 @@ per query. So `CoCount-train` has 14,834 rows over 7,417 distinct frames; likewi
 
 | Supercategory | Code | Frames | Class pairs | INTER | INTRA | Annotated points | Count range |
 |---|:--:|---:|---:|---:|---:|---:|:--:|
-| Food | `FOO` | 1,820 | 19 | 920 | 900 | 434,240 | 4–472 |
-| Game | `FUN` | 1,270 | 20 | 578 | 692 | 123,277 | 2–145 |
-| Home | `HOU` | 1,710 | 20 | 884 | 826 | 244,164 | 4–283 |
-| Desk | `OFF` | 1,720 | 20 | 960 | 760 | 253,180 | 5–312 |
-| Misc | `OTR` | 897 | 18 | 446 | 451 | 104,775 | 4–269 |
-| **Total** | | **7,417** | **97** | **3,788** | **3,629** | **1,159,636** | **2–472** |
+| Food | `FOO` | 1,820 | 19 | 920 | 900 | 434,240 | 4-472 |
+| Game | `FUN` | 1,270 | 20 | 578 | 692 | 123,277 | 2-145 |
+| Home | `HOU` | 1,710 | 20 | 884 | 826 | 244,164 | 4-283 |
+| Desk | `OFF` | 1,720 | 20 | 960 | 760 | 253,180 | 5-312 |
+| Misc | `OTR` | 897 | 18 | 446 | 451 | 104,775 | 4-269 |
+| **Total** | | **7,417** | **97** | **3,788** | **3,629** | **1,159,636** | **2-472** |
 
 Counts per class are dense and long-tailed: median 53, mean 78, and fewer than half of all classes
 have 50 objects or fewer:
