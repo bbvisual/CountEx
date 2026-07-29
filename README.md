@@ -150,6 +150,27 @@ new comparisons.
 
 ---
 
+## Results
+
+CoCount test set. All methods are trained on the same data under either setting; lower is better.
+
+| Method | NC MAE | NC RMSE | KC MAE | KC RMSE |
+|---|---:|---:|---:|---:|
+| LLMDet | 33.22 | 47.66 | 16.82 | 29.23 |
+| CAD-GD | 34.08 | 50.39 | 16.00 | 27.52 |
+| GroundingREC | 29.29 | 42.43 | 17.54 | 27.41 |
+| CountGD | 33.78 | 48.29 | 15.55 | 28.32 |
+| **CountEx** | **26.61** | **38.86** | **12.72** | **23.99** |
+
+Transferring to benchmarks it was not trained on, CountEx reaches MAE 15.61 / 12.57 (inter / intra)
+on [PairTally](https://github.com/bbvisual/PairTally_Benchmark), against 19.67 / 15.67 for CountGD
+trained on the same data, and 18.53 on LOOKALIKES, the best zero-shot result there. Ablations,
+per-split breakdowns and the full comparison tables are on the
+[project page](https://bbvisual.github.io/CountEx/) and in the
+[paper](https://arxiv.org/abs/2602.19432).
+
+---
+
 ## Setup
 
 ```bash

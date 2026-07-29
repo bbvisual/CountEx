@@ -143,6 +143,13 @@
   thead th{font-size:.76rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700}
   tbody tr:hover{background:var(--card)}
   tr.total{font-weight:700} tr.total td{border-top:2px solid var(--line)}
+  /* result tables: bold the proposed method, and set off the grouping rows */
+  tr.best{font-weight:700}
+  tr.grp td{
+    padding-top:14px; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted); font-weight:600; border-bottom:none;
+  }
+  thead tr:first-child th[colspan]{text-align:center; border-bottom:1px solid var(--line)}
   caption{caption-side:bottom; margin-top:11px; font-size:.86rem; color:var(--muted); text-align:left}
 
   pre{
@@ -391,8 +398,129 @@ print(ex["neg_caption"], ex["neg_count"], len(ex["neg_points"]))</code></pre>
       entirely, measuring zero-shot transfer to unseen objects.
     </p>
 
-    <!-- TODO: add the baseline comparison table (CountGD, DAVE, LOCA, …) from the paper. -->
-    <p><span class="todo">TODO: baseline comparison table</span></p>
+    <div class="scroll">
+      <table>
+        <caption>Table 2. CoCount test set. All methods are trained on the same data under either
+        setting. Lower is better; best in bold.</caption>
+        <thead>
+          <tr><th rowspan="2">Method</th>
+              <th colspan="2">NC-setting</th><th colspan="2">KC-setting</th></tr>
+          <tr><th>MAE</th><th>RMSE</th><th>MAE</th><th>RMSE</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>LLMDet</td><td>33.22</td><td>47.66</td><td>16.82</td><td>29.23</td></tr>
+          <tr><td>CAD-GD</td><td>34.08</td><td>50.39</td><td>16.00</td><td>27.52</td></tr>
+          <tr><td>GroundingREC</td><td>29.29</td><td>42.43</td><td>17.54</td><td>27.41</td></tr>
+          <tr><td>CountGD</td><td>33.78</td><td>48.29</td><td>15.55</td><td>28.32</td></tr>
+          <tr class="best"><td>CountEx</td><td>26.61</td><td>38.86</td><td>12.72</td><td>23.99</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Generalization to other benchmarks</h3>
+    <p>
+      The same model transfers to counting benchmarks it was not trained on, including
+      <a href="https://arxiv.org/abs/2509.13939">PairTally</a>.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <caption>Table 4. PairTally. Best in bold. NAE is the normalised absolute error.</caption>
+        <thead>
+          <tr><th rowspan="2">Model</th><th colspan="2">MAE</th><th colspan="2">NAE</th></tr>
+          <tr><th>Inter</th><th>Intra</th><th>Inter</th><th>Intra</th></tr>
+        </thead>
+        <tbody>
+          <tr class="grp"><td colspan="5">Pre-trained specialist counting models</td></tr>
+          <tr><td>DAVE</td><td>46.27</td><td>46.75</td><td>0.779</td><td>0.797</td></tr>
+          <tr><td>GeCo</td><td>45.05</td><td>54.80</td><td>0.777</td><td>0.935</td></tr>
+          <tr><td>LoCA</td><td>71.89</td><td>57.45</td><td>1.177</td><td>0.950</td></tr>
+          <tr><td>FamNet</td><td>66.97</td><td>74.75</td><td>1.363</td><td>1.440</td></tr>
+          <tr><td>CountGD</td><td>39.78</td><td>56.54</td><td>0.673</td><td>0.906</td></tr>
+          <tr><td>CountGD (text)</td><td>50.23</td><td>53.93</td><td>0.712</td><td>0.841</td></tr>
+          <tr><td>LLMDet</td><td>78.72</td><td>142.08</td><td>0.661</td><td>1.060</td></tr>
+          <tr class="grp"><td colspan="5">Pre-trained large vision-language models</td></tr>
+          <tr><td>Ovis2</td><td>56.87</td><td>74.24</td><td>0.711</td><td>0.736</td></tr>
+          <tr><td>Qwen2.5-VL</td><td>46.35</td><td>67.86</td><td>0.598</td><td>0.712</td></tr>
+          <tr><td>LLaMA-3.2</td><td>49.14</td><td>58.73</td><td>0.730</td><td>0.740</td></tr>
+          <tr><td>InternVL3</td><td>55.89</td><td>71.47</td><td>0.667</td><td>0.721</td></tr>
+          <tr class="grp"><td colspan="5">Models trained on CoCount</td></tr>
+          <tr><td>LLMDet</td><td>18.78</td><td>21.06</td><td>0.225</td><td>0.368</td></tr>
+          <tr><td>CAD-GD</td><td>19.47</td><td>16.98</td><td>0.243</td><td>0.259</td></tr>
+          <tr><td>GroundingREC</td><td>19.71</td><td>17.91</td><td>0.260</td><td>0.349</td></tr>
+          <tr><td>CountGD</td><td>19.67</td><td>15.67</td><td>0.263</td><td>0.318</td></tr>
+          <tr class="best"><td>CountEx</td><td>15.61</td><td>12.57</td><td>0.197</td><td>0.229</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <caption>Table 3. LOOKALIKES. * denotes training on CoCount before zero-shot evaluation.
+        CountEx is the best zero-shot method. D&rsquo;Alessandro et al. reach a lower MAE but
+        require per-category synthetic data generation and test-time adaptation, at 5-7 minutes per
+        category, so it is not a zero-shot comparison.</caption>
+        <thead><tr><th>Method</th><th>MAE</th><th>RMSE</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="3">Per-category synthetic data generation and adaptation</td></tr>
+          <tr><td>D&rsquo;Alessandro et al.</td><td>10.00</td><td>16.95</td></tr>
+          <tr class="grp"><td colspan="3">Zero-shot, no training or adaptation</td></tr>
+          <tr><td>OWLv2</td><td>37.25</td><td>55.01</td></tr>
+          <tr><td>GroundingDINO</td><td>33.89</td><td>59.51</td></tr>
+          <tr><td>PseCo</td><td>59.82</td><td>72.79</td></tr>
+          <tr><td>DAVE</td><td>56.10</td><td>73.34</td></tr>
+          <tr><td>CountGD</td><td>22.34</td><td>33.90</td></tr>
+          <tr><td>LLMDet*</td><td>22.86</td><td>33.29</td></tr>
+          <tr><td>CAD-GD*</td><td>28.14</td><td>41.30</td></tr>
+          <tr><td>GroundingREC*</td><td>27.24</td><td>41.57</td></tr>
+          <tr><td>CountGD*</td><td>23.55</td><td>36.89</td></tr>
+          <tr class="best"><td>CountEx*</td><td>18.53</td><td>30.46</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What each part contributes</h3>
+    <div class="scroll">
+      <table>
+        <caption>Table 5. Combinations of multimodal prompts, on the CoCount test set.
+        T = text prompt, E = visual exemplars.</caption>
+        <thead>
+          <tr><th colspan="4">Prompt</th><th colspan="2">NC-setting</th><th colspan="2">KC-setting</th></tr>
+          <tr><th>T<sup>pos</sup></th><th>E<sup>pos</sup></th><th>T<sup>neg</sup></th><th>E<sup>neg</sup></th>
+              <th>MAE</th><th>RMSE</th><th>MAE</th><th>RMSE</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>✓</td><td></td><td></td><td></td><td>32.22</td><td>48.38</td><td>15.96</td><td>28.76</td></tr>
+          <tr><td>✓</td><td>✓</td><td></td><td></td><td>31.57</td><td>46.73</td><td>15.75</td><td>27.59</td></tr>
+          <tr><td>✓</td><td></td><td>✓</td><td></td><td>26.67</td><td>39.00</td><td>13.22</td><td>26.23</td></tr>
+          <tr class="best"><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>26.61</td><td>38.86</td><td>12.72</td><td>23.99</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">
+      The exclusion prompt is what moves the needle: adding T<sup>neg</sup> to a positive-only prompt
+      cuts NC MAE from 32.22 to 26.67, a far larger gain than adding positive exemplars alone
+      (31.57). The paper also reports that a <em>mismatched</em> negative (asking to exclude "red"
+      in a scene of black and brown candies) still helps, reaching 28.43 - worse than a relevant
+      negative, but better than none at all.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <caption>Table 6. Loss components. Both the density loss and the prototype losses
+        contribute.</caption>
+        <thead>
+          <tr><th>L<sub>den</sub></th><th>L<sub>proto</sub></th>
+              <th colspan="2">NC-setting</th><th colspan="2">KC-setting</th></tr>
+          <tr><th></th><th></th><th>MAE</th><th>RMSE</th><th>MAE</th><th>RMSE</th></tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td>30.75</td><td>42.84</td><td>15.20</td><td>28.33</td></tr>
+          <tr><td>✓</td><td></td><td>29.21</td><td>41.61</td><td>13.00</td><td>25.22</td></tr>
+          <tr class="best"><td>✓</td><td>✓</td><td>26.61</td><td>38.86</td><td>12.72</td><td>23.99</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h3>Corrected test annotations</h3>
     <p>
