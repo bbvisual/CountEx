@@ -48,12 +48,17 @@
   code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.9em}
 
   /* ---- sliding sample strip ----
-     Two full-bleed rows drifting in opposite directions. The track holds the
-     same tiles twice and translates by exactly -50%, so the loop is seamless;
-     spacing uses margin-right rather than `gap`, because with `gap` the -50%
-     mark falls half a gap short and the loop visibly jumps. */
+     Two rows drifting in opposite directions, held to the same column width as
+     the body text rather than running full-bleed. The track holds the tiles
+     twice and translates by exactly -50%, so the loop is seamless; spacing uses
+     margin-right rather than `gap`, because with `gap` the -50% mark falls half
+     a gap short and the loop visibly jumps. */
   .strip-sec{padding:34px 0 30px; border-bottom:1px solid var(--line)}
-  .marquee{overflow:hidden; width:100%}
+  .marquee{
+    overflow:hidden; width:calc(100% - 44px);
+    max-width:calc(var(--maxw) - 44px);
+    margin:0 auto; border-radius:8px;
+  }
   .marquee + .marquee{margin-top:10px}
   .track{display:flex; width:max-content; animation:drift 80s linear infinite}
   .track.rev{animation-direction:reverse}
