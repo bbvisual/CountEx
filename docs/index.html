@@ -47,21 +47,33 @@
   a:hover{text-decoration:underline}
   code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.9em}
 
-  /* ---- hero banner ---- */
-  /* A banner strip, not a full-viewport image: cap the height and let
-     object-fit crop, so the title is visible without scrolling. */
-  .hero{
-    width:100%; display:block; border-bottom:1px solid var(--line);
-    height:clamp(150px, 26vh, 280px); object-fit:cover; object-position:center;
-    background:var(--card);
+  /* ---- sliding sample strip ----
+     Two full-bleed rows drifting in opposite directions. The track holds the
+     same tiles twice and translates by exactly -50%, so the loop is seamless;
+     spacing uses margin-right rather than `gap`, because with `gap` the -50%
+     mark falls half a gap short and the loop visibly jumps. */
+  .strip-sec{padding:34px 0 30px; border-bottom:1px solid var(--line)}
+  .marquee{overflow:hidden; width:100%}
+  .marquee + .marquee{margin-top:10px}
+  .track{display:flex; width:max-content; animation:drift 80s linear infinite}
+  .track.rev{animation-direction:reverse}
+  .track img{
+    height:clamp(112px, 15vw, 172px); width:auto; display:block;
+    margin-right:10px; border-radius:6px; background:var(--card);
   }
-  .hero-cap{
-    max-width:var(--maxw); margin:0 auto; padding:10px 22px 0;
+  @keyframes drift{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .marquee:hover .track, .marquee:focus-within .track{animation-play-state:paused}
+  @media (prefers-reduced-motion:reduce){
+    .track{animation:none}
+    .marquee{overflow-x:auto}
+  }
+  .strip-cap{
+    max-width:var(--maxw); margin:16px auto 0; padding:0 22px;
     font-size:.86rem; color:var(--muted); text-align:center;
   }
 
   /* ---- header ---- */
-  header{padding:40px 0 36px; text-align:center; border-bottom:1px solid var(--line)}
+  header{padding:56px 0 40px; text-align:center; border-bottom:1px solid var(--line)}
   h1{margin:0 0 6px; font-size:clamp(2rem,5vw,3.1rem); line-height:1.1; letter-spacing:-.02em}
   h1 .sub{display:block; font-size:.44em; font-weight:500; color:var(--muted); margin-top:14px; letter-spacing:0}
   .authors{margin:22px 0 8px; font-size:1.02rem}
@@ -140,9 +152,6 @@
 </head>
 <body>
 
-<img class="hero" src="assets/cocount_teaser.jpg"
-     alt="Mosaic of CoCount scenes: mixed piles of beans, cards, cotton buds, craft sticks, chess pieces, batteries, buttons, pens, screws and clips photographed on tables and floors.">
-<p class="hero-cap">CoCount: 10,086 annotated frames, each containing two confusable object classes.</p>
 
 <header>
   <div class="wrap">
@@ -178,6 +187,68 @@
     </nav>
   </div>
 </header>
+
+<section class="strip-sec" aria-label="Examples from the CoCount dataset">
+  <div class="marquee">
+    <div class="track" aria-hidden="true">
+      <img src="assets/strip/r0_00.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_01.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_02.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_03.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_04.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_05.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_06.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_07.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_08.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_09.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_10.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_11.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_00.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_01.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_02.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_03.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_04.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_05.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_06.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_07.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_08.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_09.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_10.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r0_11.jpg" alt="" loading="lazy">
+    </div>
+  </div>
+  <div class="marquee">
+    <div class="track rev" aria-hidden="true">
+      <img src="assets/strip/r1_00.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_01.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_02.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_03.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_04.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_05.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_06.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_07.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_08.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_09.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_10.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_11.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_00.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_01.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_02.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_03.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_04.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_05.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_06.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_07.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_08.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_09.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_10.jpg" alt="" loading="lazy">
+      <img src="assets/strip/r1_11.jpg" alt="" loading="lazy">
+    </div>
+  </div>
+  <p class="strip-cap">Scenes from CoCount. Every one contains two confusable
+  classes, counted independently.</p>
+</section>
+
 
 <section>
   <div class="wrap">
@@ -354,6 +425,32 @@ print(ex["neg_caption"], ex["neg_count"], len(ex["neg_points"]))</code></pre>
 
 <section>
   <div class="wrap">
+    <h2>Prior work: PairTally</h2>
+    <p>
+      This work follows directly from
+      <a href="https://arxiv.org/abs/2509.13939">PairTally</a> (DICTA 2025), by the same authors,
+      which asked whether current models can count <em>what we mean, not what they see</em>.
+      PairTally established the problem as a benchmark: 681 controlled images, each pairing two
+      confusable categories over the same five supercategories used here, with 50 inter-category and
+      47 intra-category pairs. Evaluating ten models across three counting paradigms, it found that
+      none reliably honours a fine-grained intent.
+    </p>
+    <p>
+      PairTally is diagnostic and evaluation-only, and at 681 images too small to train on. CountEx
+      takes the next two steps: <strong>CoCount</strong> scales the same paired design to 10,086
+      annotated frames over 97 category pairs, enough to train on, and CountEx supplies a method for
+      the exclusion intent PairTally showed was missing. CountEx is also evaluated <em>on</em>
+      PairTally, where it outperforms pre-trained specialist counters, general vision-language
+      models, and detectors trained on CoCount (paper, Table 4).
+    </p>
+    <p class="muted">
+      Benchmark and code: <a href="https://github.com/bbvisual/PairTally_Benchmark">PairTally_Benchmark</a>
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <h2>Code and checkpoints</h2>
     <pre><code>git clone https://github.com/bbvisual/CountEx.git
 cd CountEx
@@ -381,6 +478,15 @@ bash scripts/eval/nc_food.sh        # novel-category, Food held out</code></pre>
   author    = {Huang, Yifeng and Nguyen, Gia Khanh and Hoai, Minh},
   booktitle = {European Conference on Computer Vision (ECCV)},
   year      = {2026}
+}</code></pre>
+    <p class="muted">If you use CoCount or build on the fine-grained counting setting, please also
+    cite PairTally, which introduced it:</p>
+    <pre><code>@inproceedings{nguyen2025pairtally,
+  title     = {Can Current AI Models Count What We Mean, Not What They See?
+               A Benchmark and Systematic Evaluation},
+  author    = {Nguyen, Gia Khanh and Huang, Yifeng and Hoai, Minh},
+  booktitle = {Digital Image Computing: Techniques and Applications (DICTA)},
+  year      = {2025}
 }</code></pre>
   </div>
 </section>

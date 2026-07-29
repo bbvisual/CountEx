@@ -50,6 +50,14 @@ Alongside the method we release **CoCount**, a large fine-grained counting bench
 *every* image contains two confusable classes annotated independently, so a model cannot score
 well by simply counting "all the small round things."
 
+This work follows on from **[PairTally](https://github.com/bbvisual/PairTally_Benchmark)**
+(DICTA 2025) by the same authors, which introduced the fine-grained counting setting as a
+benchmark: 681 controlled images pairing two confusable categories, on which ten models across
+three counting paradigms were shown to miss the intended target. PairTally is diagnostic and too
+small to train on; CoCount scales the same paired design to 10,086 annotated frames over 97
+category pairs, and CountEx supplies the exclusion mechanism PairTally showed was missing. CountEx
+is also evaluated on PairTally, where it outperforms all reported baselines.
+
 > **Hardware note:** all training and inference run in `bf16`, so an NVIDIA **Ampere or newer** GPU
 > is required. All experiments were conducted on NVIDIA RTX A5000 GPUs.
 
@@ -284,5 +292,18 @@ docs/                            # project page (GitHub Pages)
   author    = {Huang, Yifeng and Nguyen, Gia Khanh and Hoai, Minh},
   booktitle = {European Conference on Computer Vision (ECCV)},
   year      = {2026}
+}
+```
+
+If you use CoCount or build on the fine-grained counting setting, please also cite PairTally, which
+introduced it:
+
+```bibtex
+@inproceedings{nguyen2025pairtally,
+  title     = {Can Current AI Models Count What We Mean, Not What They See?
+               A Benchmark and Systematic Evaluation},
+  author    = {Nguyen, Gia Khanh and Huang, Yifeng and Hoai, Minh},
+  booktitle = {Digital Image Computing: Techniques and Applications (DICTA)},
+  year      = {2025}
 }
 ```
