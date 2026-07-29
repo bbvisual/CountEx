@@ -53,7 +53,7 @@
      twice and translates by exactly -50%, so the loop is seamless; spacing uses
      margin-right rather than `gap`, because with `gap` the -50% mark falls half
      a gap short and the loop visibly jumps. */
-  .strip-sec{padding:34px 0 30px; border-bottom:1px solid var(--line)}
+  .strip-sec{padding:34px 0 30px}
   .marquee{
     overflow:hidden; width:calc(100% - 44px);
     max-width:calc(var(--maxw) - 44px);
@@ -78,7 +78,7 @@
   }
 
   /* ---- header ---- */
-  header{padding:56px 0 40px; text-align:center; border-bottom:1px solid var(--line)}
+  header{padding:56px 0 40px; text-align:center}
   h1{margin:0 0 6px; font-size:clamp(2rem,5vw,3.1rem); line-height:1.1; letter-spacing:-.02em}
   h1 .sub{display:block; font-size:.44em; font-weight:500; color:var(--muted); margin-top:14px; letter-spacing:0}
   .authors{margin:22px 0 8px; font-size:1.02rem}
@@ -110,8 +110,7 @@
   .btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 
   /* ---- sections ---- */
-  section{padding:52px 0; border-bottom:1px solid var(--line)}
-  section:last-of-type{border-bottom:none}
+  section{padding:46px 0}
   h2{font-size:1.55rem; margin:0 0 6px; letter-spacing:-.01em}
   h3{font-size:1.1rem; margin:34px 0 10px}
   p{margin:14px 0}
