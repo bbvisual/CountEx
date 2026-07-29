@@ -6,7 +6,10 @@
 
 # CountEx: Fine-Grained Counting via Exemplars and Exclusion
 
-Yifeng Huang · Gia Khanh Nguyen · Minh Hoai
+Yifeng Huang<sup>1</sup> · Gia Khanh Nguyen<sup>2</sup> · Minh Hoai<sup>2</sup>
+
+<sup>1</sup>Department of Computer Science, Stony Brook University<br>
+<sup>2</sup>Australian Institute for Machine Learning, Adelaide University
 
 **ECCV 2026**
 

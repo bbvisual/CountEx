@@ -14,7 +14,7 @@
   :root{
     --bg:#ffffff; --fg:#16181d; --muted:#5b6472; --line:#e4e7ec;
     --card:#f7f8fa; --accent:#1f6feb; --pos:#20a76b; --neg:#e0453a;
-    --maxw:1080px;
+    --maxw:880px;
   }
   @media (prefers-color-scheme:dark){
     :root{ --bg:#0f1116; --fg:#e8eaed; --muted:#9aa3b2; --line:#262b34;
@@ -64,8 +64,19 @@
   header{padding:40px 0 36px; text-align:center; border-bottom:1px solid var(--line)}
   h1{margin:0 0 6px; font-size:clamp(2rem,5vw,3.1rem); line-height:1.1; letter-spacing:-.02em}
   h1 .sub{display:block; font-size:.44em; font-weight:500; color:var(--muted); margin-top:14px; letter-spacing:0}
-  .authors{margin:22px 0 4px; font-size:1.02rem}
-  .affil{color:var(--muted); font-size:.94rem; margin:0}
+  .authors{margin:22px 0 8px; font-size:1.02rem}
+  .authors sup{font-size:.68em; padding-left:1px}
+  .affil{color:var(--muted); font-size:.92rem; margin:0; line-height:1.5}
+  .affil sup{padding-right:2px}
+  .venue{margin:14px 0 0; font-size:.94rem}
+
+  .logos{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:26px; margin:24px auto 0; padding:14px 22px; width:fit-content;
+    background:#fff; border:1px solid var(--line); border-radius:8px;
+  }
+  .logos img{height:34px; width:auto; display:block}
+  @media (max-width:520px){ .logos{gap:16px} .logos img{height:26px} }
   /* Visible-but-quiet placeholder, so an unfilled slot can't ship unnoticed. */
   .todo{
     display:inline-block; border:1px dashed var(--line); border-radius:4px;
@@ -139,9 +150,23 @@
       <span class="sub">Fine-Grained Counting via Exemplars and Exclusion</span>
     </h1>
 
-    <p class="authors">Yifeng Huang &nbsp;·&nbsp; Gia Khanh Nguyen &nbsp;·&nbsp; Minh Hoai</p>
-    <!-- TODO: confirm affiliations and superscript mapping against the paper. -->
-    <p class="affil">European Conference on Computer Vision (ECCV) 2026</p>
+    <p class="authors">
+      Yifeng Huang<sup>1</sup> &nbsp;·&nbsp;
+      Gia Khanh Nguyen<sup>2</sup> &nbsp;·&nbsp;
+      Minh Hoai<sup>2</sup>
+    </p>
+    <p class="affil">
+      <sup>1</sup>Department of Computer Science, Stony Brook University<br>
+      <sup>2</sup>Australian Institute for Machine Learning, Adelaide University
+    </p>
+    <p class="venue">European Conference on Computer Vision (ECCV) 2026</p>
+
+    <!-- Official lockups, unmodified, on a white plate so they stay legible in
+         the dark theme without recolouring the marks. -->
+    <div class="logos">
+      <img src="assets/sbu-logo.svg" alt="Stony Brook University">
+      <img src="assets/adelaide-logo.svg" alt="Adelaide University">
+    </div>
 
     <nav class="links">
       <a class="btn" href="https://arxiv.org/abs/2602.19432">Paper</a>
