@@ -1,2 +1,11 @@
 wandb/
 debug.sh
+# count_only (ACCV 2026) outputs
+__pycache__/
+*.py[cod]
+count_only/experiments/
+count_only/matched_eval/
+count_only/localization_eval/
+count_only/pairtally_eval/
+count_only/logs*/
+count_only/data/

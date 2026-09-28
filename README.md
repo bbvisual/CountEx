@@ -171,6 +171,19 @@ per-split breakdowns and the full comparison tables are on the
 
 ---
 
+## Extension: count-only supervision (ACCV 2026)
+
+[`count_only/`](count_only/) holds the code for *Boosting Fine-Grained Visual Counting Using
+Count-Only Annotations* (ACCV 2026), which adapts a pretrained CountEx counter using only global
+object counts, with no new dot or box annotations. It improves over the fully supervised CountEx
+starting point on both the KC and NC splits of CoCount, and transfers to PairTally.
+
+Note that counts there are read from the **density integral** rather than from thresholded
+detections, so comparisons against the numbers above need to match the inference head. See
+[`count_only/README.md`](count_only/README.md).
+
+---
+
 ## Setup
 
 ```bash
@@ -299,6 +312,9 @@ src/
     ├── eval/                    # kc.sh, nc_*.sh (+ *_reported.sh variants)
     └── train/                   # kc.sh, nc_*.sh
 docs/                            # project page (GitHub Pages)
+count_only/                      # ACCV 2026 count-only extension (own README)
+├── requirements.txt
+└── src/                         # stage-2 trainer, matched-inference eval, ablations
 ```
 
 ---
